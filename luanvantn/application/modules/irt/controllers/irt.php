@@ -108,14 +108,19 @@ class Irt extends CI_Controller {
 			
 		}
 		//tinh do tuong quan nhi phan
-		$tong_diem_tat_ca_user = $this->m_irt->tong_diem_tat_ca_user();
 
-		// print_r($du_lieu_CH);
-		foreach ($du_lieu_CH as $id_CH => $du_lieu_ch) {
-			$XTB = $tong_diem_tat_ca_user[0]['tongtatcadiemuser']/($du_lieu_ch['tong_so_sv']);
-			
-			$a[$id_CH] = $this->myirt->do_phan_biet($du_lieu_ch['trloidung'],$du_lieu_ch['trloisai'],$tong_diem_user_trloi_tatca_CH,$du_lieu_ch['tong_so_sv'],$du_lieu_ch['so_sv_lam_dung'],$du_lieu_ch['so_sv_lam_sai'],$du_lieu_ch['tong_so_sv']);
-		}	
+		$tong_diem_tat_ca_user = $this->m_irt->tong_diem_tat_ca_user();
+		
+		$tong_SV = count($tong_diem_user_trloi_tatca_CH);
+		// print_r($du_lieu_CH);die;
+		$diem_tb_SV = $tong_diem_tat_ca_user[0]['tongtatcadiemuser']/$tong_SV;
+		// echo $diem_tb_SV;
+		$sn = $this->myirt->SN($tong_SV,$tong_diem_user_trloi_tatca_CH,$diem_tb_SV);
+
+		foreach ($du_lieu_CH as $id_CH => $dl_CH) {
+			$do_phan_biet[$id_CH]=$this->myirt->do_phan_biet($dl_CH['trloidung'],$dl_CH['trloisai'],$sn,$dl_CH['so_sv_lam_dung'],$dl_CH['so_sv_lam_sai'],$dl_CH['tong_so_sv']);
+		}
+
 	}
 
 }

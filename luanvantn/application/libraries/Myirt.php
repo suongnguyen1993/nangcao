@@ -24,16 +24,21 @@ class Myirt
 			$do_kho_ban_dau = log($dokho);
 		}
 		else $do_kho_ban_dau = 0;
-
-		$xac_xuat_do_kho = $tong_nguoi_lam_dung/$tong_ng_lam;
+		if($tong_nguoi_lam_dung == 0 || $tong_ng_lam == 0)
+		{
+			$xac_xuat_do_kho = 0.5;
+		}
+		else $xac_xuat_do_kho = $tong_nguoi_lam_dung/$tong_ng_lam;
 
 		$ln_xac_xuat_do_kho = log((1-$xac_xuat_do_kho)/$xac_xuat_do_kho);
+
 		$b = ($do_kho_ban_dau * 0.2) + ($ln_xac_xuat_do_kho * 0.8);
+
 		return $b;
 			
 	}
 
-	public function do_phan_biet($array_TB_lam_dung,$array_TB_lam_sai,$array_diem_SV,$diem_tb_SV,$so_SV_lam_dung,$so_SV_lam_sai,$tong_so_SV)
+	public function do_phan_biet($array_TB_lam_dung,$array_TB_lam_sai,$sn,$so_SV_lam_dung,$so_SV_lam_sai,$tong_so_SV)
 	{
 		$tong_sv_lam_dung_CH = 0; $tong_sv_lam_sai_CH = 0;
 		foreach ($array_TB_lam_dung as  $value) 
@@ -47,7 +52,7 @@ class Myirt
 		$TB_sv_lam_dung_CH = $tong_sv_lam_dung_CH/$so_SV_lam_dung;
 		$TB_sv_lam_sai_CH = $tong_sv_lam_sai_CH/$so_SV_lam_sai;
 
-		$m = ($TB_sv_lam_dung_CH - $TB_sv_lam_sai_CH)/$this->SN($tong_so_SV,$array_diem_SV,$diem_tb_SV);
+		$m = ($TB_sv_lam_dung_CH - $TB_sv_lam_sai_CH)/$sn;
 		$n = sqrt(($so_SV_lam_dung*$so_SV_lam_sai)/pow($tong_so_SV,2));
 
 		$a = $m * $n;
@@ -62,7 +67,6 @@ class Myirt
 		{
 			$tongdiemuserlamdung += pow(($array_diem_SV[$key] - $diem_tb_SV),2);
 		}
-		
 		$sn = sqrt($tongdiemuserlamdung/$tong_so_SV);
 
 		return $sn;
@@ -81,6 +85,7 @@ class Myirt
 		do
 		{
 			$t1=0;$t2=0;
+			// echo $theta;
 			foreach ($array_tra_loi as $key => $value)
 			{
 				// $p = round(1/(1+exp(-($array_do_phan_biet[$key]*($theta-$array_do_kho[$key])))),2);
@@ -103,11 +108,13 @@ class Myirt
 			$c=$theta;
 			$kq=$theta+$t1/$t2;
 			$theta=$kq; 
-			
+			// echo 'delta'.$t1/$t2.'~~';
 			// echo 'theta: '.$theta.'<br>';
 
 		}while(abs($kq-$c)>0.01);
 		// echo'xong'.'<br>';
+		$se = 1/sqrt($t2);
+		echo 'SE:'.$se.'<br>';
 		return $theta;
 	}
 
@@ -140,3 +147,4 @@ class Myirt
 
 /* End of file Myirt.php */
 /* Location: ./application/libraries/Facebook/Myirt.php */
+ 	
