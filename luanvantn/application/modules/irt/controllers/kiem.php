@@ -13,9 +13,12 @@ class Kiem extends CI_Controller {
 	{
 		//tinh do kho b
 		$du_lieu = $this->m_irt->get_all();
+
 		foreach ($du_lieu as $key => $value) {
 			$do_kho_thuc[$value['id']]=$this->myirt->do_kho_thuc($value['level'],$value['the_total_do_correct'],$value['the_total_do']);
 		}
+
+
 		$user = $this->m_irt->get_all_id_user();
 		
 		foreach ($user as $key => $value) 
@@ -135,18 +138,35 @@ class Kiem extends CI_Controller {
 			$do_phan_biet[$id_CH]=$this->myirt->do_phan_biet($dl_CH['trloidung'],$dl_CH['trloisai'],$sn,$dl_CH['so_sv_lam_dung'],$dl_CH['so_sv_lam_sai'],$dl_CH['tong_so_sv']);
 		}
 
+		// print_r($do_phan_biet);die;
+		//cap nha do kho thuc va do phan biet vao csdl
+		
+		// foreach ($do_kho_thuc as $key_question => $giatri) {
+			
+		// 	$dokhob = $giatri;
+		// 	$update_a_b = array(
+		// 		'do_kho_thuc' =>$dokhob ,
+		// 		'do_phan_biet' => $do_phan_biet[$key_question]
+		// 		);
+		// 	$this->query_sql->edit('question',$update_a_b, array('id'=>$key_question));
+		// }
+
+		
 		//////////////////////////////////////////////////////////////
-		//likelihood
+		
+		 // print_r($user_trloi);die;
+
+		// $s = array(30=>array(19 => 1,20 => 0));
+		// print_r($s);die;
 		foreach ($user_trloi as $k => $v) 
 		{
-
 			//xu ly level
-			$level_user = $this->myirt->chuyen_level_thanh_ty_so($user_level[$k]);
+			$level_user = $this->myirt->chuyen_level_thanh_ty_so($user_level['$k']);
 			if($level_user != 0)
 			{
 				$level = log($level_user);
 			}
-			else $level = 1;
+			else $level = 0.1;
 			
 			//tinh SE
 			$SE=$this->myirt->SE($do_kho_thuc,$level);
@@ -159,16 +179,36 @@ class Kiem extends CI_Controller {
 					{$dem +=1;}
 			}
 			$tong_dung = $dem;
-			if($tong_dung ==0 || $tong_dung ==$tong_trloi || $SE >1.5 )
+			if($SE <1.5 )
 			{
-				$theta[$k] = $level;
-			}
-			else 
-				{$theta[$k]=$this->myirt->likelihood($v,$do_kho_thuc,$do_phan_biet,$level);}
-
+				if($tong_dung !=0 || $tong_dung !=$tong_trloi )
+				{
+					$theta[$k]=$this->myirt->likelihood($v,$do_kho_thuc,$do_phan_biet,$level);
+				}
+			}		
 		}
-		print_r($theta);
-	} 	
+
+		foreach ($do_kho_thuc as $cauhoi => $b) 
+		{
+			$thong_tin[$cauhoi] = $this->myirt->ham_thong_tin_cau_hoi($level,$b,$do_phan_biet[$cauhoi]);		
+		}
+
+		foreach ($thong_tin as $key => $thongtin) 
+		{
+			$tmp = array(
+					'id_question' => $key,
+					'thong_tin' =>$thongtin,
+					'id_user' =>30
+				);
+
+			$this->query_sql->add('tam',$tmp );
+		}
+		
+	}
+
+	
+
+
 }
 
 /* End of file kiem.php */

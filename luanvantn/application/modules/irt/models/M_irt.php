@@ -14,6 +14,20 @@ class M_irt extends CI_Model {
 
 		return $query->result_array();
 	}
+	public function get_1_user($where)
+	{
+		$sql = "SELECT `id_question`,`trloi` FROM `ma_tran_tra_loi` WHERE `id_user`= ?";
+
+		$query = $this->db->query($sql,array($where));
+		return $query->result_array();
+	}
+	public function get_a_b()
+	{
+		$sql = "SELECT `id`,`do_kho_thuc`,`do_phan_biet` FROM `question` WHERE `group_id` = 5";
+
+		$query = $this->db->query($sql);
+		return $query->result_array();
+	}
 
 	public function get_all_id_user()
 	{

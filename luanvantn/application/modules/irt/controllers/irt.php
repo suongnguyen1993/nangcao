@@ -19,6 +19,71 @@ class Irt extends CI_Controller {
 		$this->myirt->likelihood($u,$b,$a,$theta);
 			
 	}
+
+	public function test()
+	{
+
+		$id_u = $this->session->userdata('id');
+		$du_lieu_user = $this->m_irt->get_1_user($id_u);
+
+		$dulieu_a_b = $this->m_irt->get_a_b();
+		// print_r($dulieu_a_b);die;
+		foreach ($dulieu_a_b as $value) {
+			$do_kho_thuc[$value['id']] = $value['do_kho_thuc'];
+			$do_phan_biet[$value['id']] = $value['do_phan_biet'];
+		}
+
+		foreach ($du_lieu_user as $value) 
+		{
+			$user_trloi[$id_u][$value['id_question']] = $value['trloi'];
+		}
+		// print_r($user_trloi);
+		foreach ($user_trloi as $k => $v) 
+		{
+			//xu ly level
+			$level_user = $this->myirt->chuyen_level_thanh_ty_so(200);
+			if($level_user != 0)
+			{
+				$level = log($level_user);
+			}
+			else $level = 0.1;
+			
+			//tinh SE
+			$SE=$this->myirt->SE($do_kho_thuc,$level);
+			
+			//kiem tr nguoi dung tr loi dung het hoac sai het
+			$tong_trloi = count($v);
+			$dem = 0;
+			foreach ($v as $e) {
+				if($e == 1)
+					{$dem +=1;}
+			}
+			$tong_dung = $dem;
+			if($SE <1.5 )
+			{
+				if($tong_dung !=0 || $tong_dung !=$tong_trloi )
+				{
+					$theta[$k]=$this->myirt->likelihood($v,$do_kho_thuc,$do_phan_biet,$level);
+				}
+			}		
+		}
+
+		foreach ($do_kho_thuc as $cauhoi => $b) 
+		{
+			$thong_tin[$cauhoi] = $this->myirt->ham_thong_tin_cau_hoi($level,$b,$do_phan_biet[$cauhoi]);		
+		}
+
+		// foreach ($thong_tin as $key => $thongtin) 
+		// {
+		// 	$tmp = array(
+		// 			'id_question' => $key,
+		// 			'thong_tin' =>$thongtin,
+		// 			'id_user' =>30
+		// 		);
+
+		// 	$this->query_sql->add('tam',$tmp );
+		// }
+	}
 	public function e()
 	{
 		/*
